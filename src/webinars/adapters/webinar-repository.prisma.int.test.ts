@@ -71,4 +71,71 @@ describe('PrismaWebinarRepository', () => {
       });
     });
   });
+
+  describe('Scenario : repository.findById', () => {
+    it('should return null when webinar does not exist', async () => {
+      const result = await repository.findById('non-existent-id');
+      expect(result).toBeNull();
+    });
+
+    it('should return the webinar when it exists', async () => {
+      await prismaClient.webinar.create({
+        data: {
+          id: 'webinar-id',
+          organizerId: 'organizer-id',
+          title: 'Webinar title',
+          startDate: new Date('2022-01-01T00:00:00Z'),
+          endDate: new Date('2022-01-01T01:00:00Z'),
+          seats: 100,
+        },
+      });
+
+      const result = await repository.findById('webinar-id');
+      expect(result).not.toBeNull();
+      expect(result?.props.id).toBe('webinar-id');
+      expect(result?.props.organizerId).toBe('organizer-id');
+      expect(result?.props.title).toBe('Webinar title');
+      expect(result?.props.startDate).toEqual(new Date('2022-01-01T00:00:00Z'));
+      expect(result?.props.endDate).toEqual(new Date('2022-01-01T01:00:00Z'));
+      expect(result?.props.seats).toBe(100);
+    });
+  });
+
+  describe('Scenario : repository.update', () => {
+    it('should update the webinar', async () => {
+      await prismaClient.webinar.create({
+        data: {
+          id: 'webinar-id',
+          organizerId: 'organizer-id',
+          title: 'Webinar title',
+          startDate: new Date('2022-01-01T00:00:00Z'),
+          endDate: new Date('2022-01-01T01:00:00Z'),
+          seats: 100,
+        },
+      });
+
+      const webinar = new Webinar({
+        id: 'webinar-id',
+        organizerId: 'organizer-id',
+        title: 'Updated Webinar title',
+        startDate: new Date('2022-01-01T00:00:00Z'),
+        endDate: new Date('2022-01-01T01:00:00Z'),
+        seats: 200,
+      });
+
+      await repository.update(webinar);
+
+      const updatedWebinar = await prismaClient.webinar.findUnique({
+        where: { id: 'webinar-id' },
+      });
+      expect(updatedWebinar).toEqual({
+        id: 'webinar-id',
+        organizerId: 'organizer-id',
+        title: 'Updated Webinar title',
+        startDate: new Date('2022-01-01T00:00:00Z'),
+        endDate: new Date('2022-01-01T01:00:00Z'),
+        seats: 200,
+      });
+    });
+  });
 });
