@@ -62,4 +62,18 @@ describe('Feature : Change seats', () => {
       expect(webinar?.props.seats).toEqual(100);
     });
   });
+
+  describe('Scenario: change seat to an inferior number', () => {
+    const payload = {
+      user: testUser.alice,
+      webinarId: 'webinar-id',
+      seats: 50,
+    };
+
+    it('should fail', async () => {
+      await expect(useCase.execute(payload)).rejects.toThrow('You cannot reduce the number of seats');
+      const webinar = webinarRepository.findByIdSync('webinar-id');
+      expect(webinar?.props.seats).toEqual(100);
+    });
+  });
 });
