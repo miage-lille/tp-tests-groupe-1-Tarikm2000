@@ -48,4 +48,18 @@ describe('Feature : Change seats', () => {
       expect(webinar?.props.seats).toEqual(100);
     });
   });
+
+  describe('Scenario: update the webinar of someone else', () => {
+    const payload = {
+      user: testUser.bob,
+      webinarId: 'webinar-id',
+      seats: 200,
+    };
+
+    it('should fail', async () => {
+      await expect(useCase.execute(payload)).rejects.toThrow('User is not allowed to update this webinar');
+      const webinar = webinarRepository.findByIdSync('webinar-id');
+      expect(webinar?.props.seats).toEqual(100);
+    });
+  });
 });
