@@ -44,4 +44,31 @@ describe('PrismaWebinarRepository', () => {
     await container.stop({ timeout: 1000 });
     return prismaClient.$disconnect();
   });
+
+  describe('Scenario : repository.create', () => {
+    it('should create a webinar', async () => {
+      const webinar = new Webinar({
+        id: 'webinar-id',
+        organizerId: 'organizer-id',
+        title: 'Webinar title',
+        startDate: new Date('2022-01-01T00:00:00Z'),
+        endDate: new Date('2022-01-01T01:00:00Z'),
+        seats: 100,
+      });
+
+      await repository.create(webinar);
+
+      const maybeWebinar = await prismaClient.webinar.findUnique({
+        where: { id: 'webinar-id' },
+      });
+      expect(maybeWebinar).toEqual({
+        id: 'webinar-id',
+        organizerId: 'organizer-id',
+        title: 'Webinar title',
+        startDate: new Date('2022-01-01T00:00:00Z'),
+        endDate: new Date('2022-01-01T01:00:00Z'),
+        seats: 100,
+      });
+    });
+  });
 });
