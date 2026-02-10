@@ -1,8 +1,10 @@
 import { IIdGenerator } from 'src/core/ports/id-generator.interface';
-import { v4 as uuidV4 } from 'uuid';
 
 export class RealIdGenerator implements IIdGenerator {
   generate() {
-    return uuidV4();
+    if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
+      return crypto.randomUUID();
+    }
+    return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
   }
 }
